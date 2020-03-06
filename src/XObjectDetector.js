@@ -210,21 +210,40 @@ export class XObjectDetector extends LitElement {
     for (let i = 0; i < event.dataTransfer.files.length; i++) {
       let droppedFile = event.dataTransfer.files[i]
 
-      createImageBitmap(droppedFile).then(imageBitmap => {
-        this._setupCanvas(this._canvasElement, { image: imageBitmap }).then(ctx => {
-          const imageFromCanvas = new Image()
+      const filename = droppedFile.name
 
-          imageFromCanvas.addEventListener('load', e => {
-            this._handlePrediction(ctx, imageFromCanvas)
-          })
+      const reader = new FileReader()
 
-          imageFromCanvas.src = this._canvasElement.toDataURL()
-        })
-      }).catch(error => {
-        this.dispatchEvent(events.XObjectDetectorImageLoadingFailure(error))
+      reader.onload = event => {
+        FS.writeFile('memfs', new Uint8Array(event.target.result), { encoding: 'binary' })
 
-        process.env.NODE_ENV !== 'production' && console.error(error)
-      })
+        const currentDocument = mupdf.openDocument('memfs')
+
+        document.title = mupdf.documentTitle(currentDocument)
+
+        const pageCount = mupdf.countPages(currentDocument)
+        const fileAsPNG = mupdf.drawPageAsPNG(currentDocument, 1, 72)
+
+        this._handleImageUrlPrediction(this._canvasElement, fileAsPNG)
+      }
+
+      reader.readAsArrayBuffer(droppedFile)
+
+      // createImageBitmap(droppedFile).then(imageBitmap => {
+      //   this._setupCanvas(this._canvasElement, { image: imageBitmap }).then(ctx => {
+      //     const imageFromCanvas = new Image()
+
+      //     imageFromCanvas.addEventListener('load', e => {
+      //       this._handlePrediction(ctx, imageFromCanvas)
+      //     })
+
+      //     imageFromCanvas.src = this._canvasElement.toDataURL()
+      //   })
+      // }).catch(error => {
+      //   this.dispatchEvent(events.XObjectDetectorImageLoadingFailure(error))
+
+      //   process.env.NODE_ENV !== 'production' && console.error(error)
+      // })
     }
   }
 
@@ -404,6 +423,14 @@ export class XObjectDetector extends LitElement {
   }
 
   firstUpdated() {
+<<<<<<< HEAD
+=======
+    const libmupdfScript = document.createElement('script')
+    libmupdfScript.src = './libmupdf.js'
+
+    document.body.appendChild(libmupdfScript)
+
+>>>>>>> d18c290... initial commit
     if (!this.wasmPath) {
       return
     }
