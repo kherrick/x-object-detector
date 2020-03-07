@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+  <base href="/">
+  <title>XObjectDetector</title>
+  <style>
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      background-color: #111;
+      color: #eee;
+      text-align: center;
+    }
+
+    #grid-container {
+      align-items: center;
+      display: grid;
+      grid-template-areas: "top" "middle" "bottom";
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      height: 100%;
+      justify-items: center;
+    }
+
+    #top, #middle, #bottom {
+      width: 100%;
+    }
+
+    #top {
+      grid-area: top;
+    }
+
+    #middle {
+      height: 100%;
+      grid-area: middle;
+    }
+
+    #bottom {
+      grid-area: bottom;
+    }
+  </style>
+</head>
+<body>
+  <section id="grid-container">
+    <section id="top">
+      <h1>&lt;x-object-detector&gt;</h1>
+    </section>
+    <section id="middle">
+      <x-object-detector
+        draw
+        label
+        strokeStyle="red"
+        labelTextColor="yellow"
+        labelBGColor="blue"
+        labelFontSize="16"
+        maxNumBoxes="10"
+        lineWidth="5"
+        apiHost=""
+        wasmPath="node_modules/@tensorflow/tfjs-backend-wasm/dist/tfjs-backend-wasm.wasm"
+      >
+        loading...
+      </x-object-detector>
+    </section>
+    <section id="bottom">
+    </section>
+  </section>
+<script type="module" src="XObjectDetector.js"></script></body>
+</html>
