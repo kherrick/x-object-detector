@@ -52,7 +52,13 @@
     <section id="middle">
       <x-object-detector
         draw
-        maxNumBoxes="3"
+        label
+        strokeStyle="red"
+        labelTextColor="yellow"
+        labelBGColor="blue"
+        labelFontSize="16"
+        maxNumBoxes="10"
+        lineWidth="5"
         apiHost="<%= htmlWebpackPlugin.options.apiHost %>"
         wasmPath="<%= htmlWebpackPlugin.options.wasmPath %>"
       >

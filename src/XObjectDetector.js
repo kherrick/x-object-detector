@@ -20,13 +20,23 @@ export * from './events'
 export class XObjectDetector extends LitElement {
   @property({ type: String, reflect: true })
   imgUrl = IMG_URL
-  @property({ type: String, reflect: true })
-  strokeStyle = 'yellow'
   @property({ type: Number, reflect: true })
-  lineWidth = 10
+  maxNumBoxes = 10
   @property({ type: Number, reflect: true })
-  maxNumBoxes = 1
+  labelFontSize = 16
+  @property({ type: Number, reflect: true })
+  lineWidth = 5
   @property({ type: String, reflect: true })
+  strokeStyle = 'red'
+  @property({ type: String, reflect: true })
+  labelTextColor = 'yellow'
+  @property({ type: String, reflect: true })
+  labelBGColor = 'blue'
+  @property({ type: Boolean, reflect: false })
+  label = false
+  @property({ type: Boolean, reflect: false })
+  draw = false
+  @property({ type: String, reflect: false })
   base = 'lite_mobilenet_v2'
   @property({ type: String, reflect: false })
   wasmPath = WASM_PATH
@@ -36,8 +46,6 @@ export class XObjectDetector extends LitElement {
   isReadyToPredict = false
   @property({ type: Boolean, reflect: false })
   canPredictVideo = false
-  @property({ type: Boolean, reflect: false })
-  draw = false
 
   static get styles() {
     return css`
@@ -76,21 +84,45 @@ export class XObjectDetector extends LitElement {
     `
   }
 
+  _drawTextBG(text, font, bgColor, textColor, ctx, x, y) {
+    ctx.save()
+
+    ctx.font = font
+    ctx.textBaseline = 'top'
+
+    // background color
+    ctx.fillStyle = bgColor
+
+    // get width of text
+    const width = ctx.measureText(text).width
+
+    // draw background rectangle
+    ctx.fillRect(x, y, width, parseInt(font, 10))
+
+    // text color
+    ctx.fillStyle = textColor
+
+    // draw text on top of rectangle
+    ctx.fillText(text, x, y)
+
+    ctx.restore()
+  }
+
   _handlePrediction(ctx, image) {
     // Pass in an image or video to the model. The model returns an array of
     // bounding boxes, class, and score, one for each detected object.
-
     return this.model.detect(image, this.maxNumBoxes).then(predictions => {
       if (predictions.length > 0) {
+
         /*
         `predictions` is an array of objects describing each detected object, for example:
         [
           {
             bbox: [
-              0: 97.1022516489029,
-              1: 49.67673659324646,
-              2: 61.446413397789,
-              3: 103.5690850019455,
+              97.1022516489029,
+              49.67673659324646,
+              61.446413397789,
+              103.5690850019455,
             ],
             class: 'person',
             score: 0.9899700880050659
@@ -112,8 +144,19 @@ export class XObjectDetector extends LitElement {
           this.dispatchEvent(events.XObjectDetectorObjectDetected(predictions[i]))
 
           if (this.draw) {
-            // Render a rectangle over each detected object.
+            // render a rectangle over each detected object
             ctx.strokeRect(...rectangle)
+
+            if (this.label) {
+              // render a label in the corner of each rectangle
+              const computedWidth = Number(getComputedStyle(this._canvasElement).getPropertyValue('width').split('px')[0])
+              const font = `${this.labelFontSize / (computedWidth / this._canvasElement.width)}px serif`
+
+              const x = rectangle[0]
+              const y = rectangle[1]
+
+              this._drawTextBG(className, font, this.labelTextColor, this.labelBGColor, ctx, x, y)
+            }
           }
         }
 

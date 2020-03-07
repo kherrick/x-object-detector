@@ -1,6 +1,6 @@
 {
   "name": "x-object-detector",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Detecting objects with TensorFlow.js.",
   "main": "dist/XObjectDetector.js",
   "module": "dist/XObjectDetector.js",
